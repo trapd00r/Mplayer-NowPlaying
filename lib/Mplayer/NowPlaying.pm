@@ -2,7 +2,7 @@
 package Mplayer::NowPlaying;
 use vars qw($VERSION);
 
-$VERSION = '0.011';
+$VERSION = '0.015';
 
 BEGIN {
   require Exporter;
@@ -11,9 +11,9 @@ BEGIN {
   @EXPORT = qw(now_playing);
 }
 
-
 use strict;
 use Carp;
+use Mplayer::NowPlaying::Genres;
 
 sub now_playing {
   my($log, $mode) = @_;
@@ -94,6 +94,9 @@ sub now_playing {
 
       if(exists($mplayer_internals{$tag})) { # identify used
         $tag = $mplayer_internals{$tag};
+        if($tag eq 'genre') {
+          $value = get_genre($value);
+        }
       }
 
       $value =~ s/^\s+|\s+$//;
@@ -103,6 +106,7 @@ sub now_playing {
   }
   return \%information;
 }
+
 
 1;
 
@@ -248,6 +252,6 @@ itself.
 
 =head1 SEE ALSO
 
-L<mplayer(1)>
+L<Mplayer::NowPlaying::Genres>
 
 =cut

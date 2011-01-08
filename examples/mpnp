@@ -14,7 +14,7 @@ if( (!-t STDOUT) or (@ARGV) ) {
   exit 0;
 }
 
-for my $wanted(qw(artist album title file year)) {
+for my $wanted(qw(artist album title genre year file)) {
   printf("%7s: %s\n", ucfirst($wanted), $c->{$wanted})
     unless(!exists($c->{$wanted}));
 }
