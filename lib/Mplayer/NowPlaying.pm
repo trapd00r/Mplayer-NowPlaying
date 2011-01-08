@@ -1,19 +1,19 @@
 #!/usr/bin/perl
 package Mplayer::NowPlaying;
-
 use vars qw($VERSION);
-$VERSION = '0.010';
 
-use strict;
-use Carp;
+$VERSION = '0.011';
 
 BEGIN {
   require Exporter;
   use vars qw(@ISA @EXPORT_OK);
-  @ISA = 'Exporter';
-  @EXPORT_OK = qw(now_playing);
+  @ISA    = 'Exporter';
+  @EXPORT = qw(now_playing);
 }
 
+
+use strict;
+use Carp;
 
 sub now_playing {
   my($log, $mode) = @_;
@@ -103,6 +103,8 @@ sub now_playing {
   }
   return \%information;
 }
+
+1;
 
 
 __END__
@@ -249,5 +251,3 @@ itself.
 L<mplayer(1)>
 
 =cut
-
-1;
