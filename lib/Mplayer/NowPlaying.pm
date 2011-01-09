@@ -2,18 +2,19 @@
 package Mplayer::NowPlaying;
 use vars qw($VERSION);
 
-$VERSION = '0.015';
+$VERSION = '0.020';
 
 BEGIN {
   require Exporter;
   use vars qw(@ISA @EXPORT_OK);
   @ISA    = 'Exporter';
-  @EXPORT = qw(now_playing);
+  @EXPORT = qw(now_playing now_playing_stream);
 }
 
 use strict;
 use Carp;
 use Mplayer::NowPlaying::Genres;
+
 
 sub now_playing {
   my($log, $mode) = @_;
@@ -23,15 +24,9 @@ sub now_playing {
     $mode = 'default'; # mplayer *.mp3
   }
 
-  my @content;
-  if(!ref($log)) {
-    open(my $fh, '<', $log) or croak("Can not open $log for reading: $!");
-    chomp(@content = <$fh>);
-  }
-  else {
-    @content = <$log>;
-    chomp(@content);
-  }
+  my $fh = _get_fh($log);
+  chomp(my @content = <$fh>);
+  close($fh);
 
   my %mplayer_internals = (
     ID_CLIP_INFO_VALUE0 => 'title',
@@ -107,6 +102,37 @@ sub now_playing {
   return \%information;
 }
 
+sub now_playing_stream {
+  my $log = shift;
+  my $fh = _get_fh($log);
+  chomp(my @content = <$fh>);
+  close($fh);
+
+  my %results;
+  for my $line(reverse(@content)) {
+    if($line =~ m/ICY Info: StreamTitle='(.+)';.+/m) {
+      $results{icy} = $1;
+      if($results{icy} =~ m/(.+) - (.+) - (.+)/) {
+        $results{album}  = $1;
+        $results{artist} = $2;
+        $results{title}  = $3;
+      }
+      last;
+    }
+  }
+  return \%results;
+}
+
+sub _get_fh {
+  my $file = shift;
+  not defined $file and croak("No logfile specified");
+
+  if(ref($file)) {
+    return $file;
+  }
+  open(my $fh, '<', $file) or croak("Can not open '$file': $!");
+  return $fh;
+}
 
 1;
 
@@ -137,9 +163,26 @@ B<Mplayer::NowPlaying> was born because the author runs B<mplayer> daemonized,
 controlling it via named pipes. I wanted a simple way to retrieve various 'now
 playing' metadata for the currently playing media.
 
-Mplayer::NowPlaying supports two modes:
+=head1 EXPORTS
 
-=head2 Normal
+=head2 now_playing()
+
+Parameters: $logfile | $filehandle, ($mode)
+
+Returns:    \%metadata
+
+  my %metadata = %{ now_playing($logfile, 'identify'); };
+  my $artist = $metadata{artist};
+
+B<now_playing()> takes two arguments (the last one optional):
+
+* The logfile (or filehandle) output from mplayer is directed to
+
+* 'normal' or 'identify' mode. Normal is the default.
+
+Mplayer::NowPlaying::now_playing() supports two modes:
+
+=head2 * Normal
 
 Start mplayer in normal mode and redirect STDOUT to a file:
 
@@ -156,7 +199,7 @@ Mplayer produces a lot of output in normal mode, effectively making our metadata
 retrieval slow very fast (10 files played or so). Therefore it's really
 recommended to use B<identify> mode.
 
-=head2 Identify
+=head2 * Identify
 
 Start mplayer with the -identify switch:
 
@@ -175,23 +218,6 @@ Get the current title:
 
 By using B<-msglevel all=0 -identify> the amount of output from mplayer is
 reduced to a minimum, making the retrieval very fast. This is recommended.
-
-=head1 EXPORTS
-
-=head2 now_playing()
-
-Parameters: ($logfile | $filehandle), ($mode)
-
-Returns:    \%metadata
-
-  my %metadata = %{ now_playing($logfile, 'identify'); };
-  my $artist = $metadata{artist};
-
-B<now_playing()> takes two arguments (the last one optional):
-
-* The logfile (or filehandle) output from mplayer is directed to
-
-* 'normal' or 'identify' mode. Normal is the default.
 
 The hash will be filled with the available metadata for the current media.
 A typical result might look like:
@@ -234,6 +260,25 @@ Possible keys include:
   seekable,
   start
   file
+
+=head2 now_playing_stream()
+
+Parameters: $logfile | $filehandle
+
+Returns:    \%metadata
+
+B<now_playing_stream()> takes a single argument; the logfile (or filehandle) to
+be used.
+
+If the stream being played supports B<ICY info>, a hash reference will be
+returned with artist, album, title and ICY keys and their corresponding values,
+like so:
+
+  artist => "Suzanne Vega",
+  album  => "Retrospective: The Best of Suzanne Vega",
+  title  => "Left of Center",,
+  icy    => "Retrospective: The Best of Suzanne Vega - Suzanne Vega - Left of Center",
+
 
 =head1 AUTHOR
 
