@@ -2,7 +2,7 @@
 package Mplayer::NowPlaying;
 use vars qw($VERSION);
 
-$VERSION = '0.020';
+$VERSION = '0.021';
 
 BEGIN {
   require Exporter;
@@ -95,7 +95,7 @@ sub now_playing {
       }
 
       $value =~ s/^\s+|\s+$//;
-      $information{$tag} = $value;
+      $information{ lc($tag) } = $value;
       next CONTENT;
     }
   }
