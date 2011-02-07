@@ -1,24 +1,22 @@
 #!/usr/bin/perl
 package Mplayer::NowPlaying;
-use vars qw($VERSION);
-
-$VERSION = '0.021';
+use strict;
 
 BEGIN {
   require Exporter;
-  use vars qw(@ISA @EXPORT_OK);
+  use vars qw(@ISA @EXPORT $VERSION);
+  $VERSION = '0.024';
   @ISA    = 'Exporter';
   @EXPORT = qw(now_playing now_playing_stream);
 }
 
-use strict;
-use Carp;
+use Carp qw(croak);
 use Mplayer::NowPlaying::Genres;
 
 
 sub now_playing {
   my($log, $mode) = @_;
-  not defined $log and croak("No logfile specified");
+  not defined $log and croak("No logfile specified\n");
 
   if(!defined($mode)) {
     $mode = 'default'; # mplayer *.mp3
@@ -125,12 +123,12 @@ sub now_playing_stream {
 
 sub _get_fh {
   my $file = shift;
-  not defined $file and croak("No logfile specified");
+  not defined $file and croak("No logfile specified\n");
 
   if(ref($file)) {
     return $file;
   }
-  open(my $fh, '<', $file) or croak("Can not open '$file': $!");
+  open(my $fh, '<', $file) or croak("Can not open '$file': $!\n");
   return $fh;
 }
 
@@ -148,8 +146,6 @@ Mplayer::NowPlaying - query a running mplayer process for now playing metadata
 =head1 SYNOPSIS
 
     use Mplayer::NowPlaying;
-
-    ...
 
     my $current = now_playing;
 

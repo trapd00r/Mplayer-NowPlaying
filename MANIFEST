@@ -1,3 +1,5 @@
+examples/mpnp
+examples/mpnp-stream
 lib/Mplayer/NowPlaying.pm
 lib/Mplayer/NowPlaying/Genres.pm
 Makefile.PL
@@ -6,3 +8,4 @@ README
 t/00-load.t
 t/01-pod.t
 t/02-pod-coverage.t
+t/021-synopsis.t

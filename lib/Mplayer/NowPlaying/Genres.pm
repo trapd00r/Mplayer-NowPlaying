@@ -1,23 +1,19 @@
-#!/usr/bin/perl
 package Mplayer::NowPlaying::Genres;
-use vars qw($VERSION);
-
-$VERSION = '0.001';
+use strict;
 
 BEGIN {
-  require Exporter;
-  use vars qw(@ISA @EXPORT_OK);
+  use Exporter;
+  use vars qw(@ISA @EXPORT);
   @ISA    = 'Exporter';
   @EXPORT = qw(get_genre);
 }
 
-use strict;
-use Carp;
+use Carp qw(croak);
 
 sub get_genre {
   my $genre = shift;
   if( ($genre < 0) or ($genre > 255) ) {
-    croak("A valid integer between 0 and 255, inclusive, is required");
+    croak("An integer between 0 and 255, inclusive, is required\n");
   }
 
   # Stolen from the mplayer source
@@ -219,11 +215,19 @@ Returns:    $genre
 
 =cut
 
+=head1 CONTRIBUTORS
+
+None required yet.
+
 =head1 COPYRIGHT
 
-Copyright 2011 Magnus Woldrich <magnus@trapd00r.se>. This program is free
-software; you may redistribute it and/or modify it under the same terms as Perl
-itself.
+Copyright 2010, 2011 the B<Mplayer::NowPlaying::Genres>s L</AUTHOR> and
+L</CONTRIBUTORS> as listed above.
+
+=head1 LICENSE
+
+This library is free software; you may redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =head1 SEE ALSO
 
