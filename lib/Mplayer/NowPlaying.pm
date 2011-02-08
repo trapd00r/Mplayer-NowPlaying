@@ -5,7 +5,7 @@ use strict;
 BEGIN {
   require Exporter;
   use vars qw(@ISA @EXPORT $VERSION);
-  $VERSION = '0.024';
+  $VERSION = '0.026';
   @ISA    = 'Exporter';
   @EXPORT = qw(now_playing now_playing_stream);
 }

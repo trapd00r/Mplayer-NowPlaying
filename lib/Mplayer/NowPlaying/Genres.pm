@@ -3,7 +3,8 @@ use strict;
 
 BEGIN {
   use Exporter;
-  use vars qw(@ISA @EXPORT);
+  use vars qw(@ISA @EXPORT $VERSION);
+  $VERSION = '0.010';
   @ISA    = 'Exporter';
   @EXPORT = qw(get_genre);
 }
