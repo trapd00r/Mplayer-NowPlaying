@@ -4,19 +4,19 @@ use strict;
 
 BEGIN {
   require Exporter;
-  use vars qw(@ISA @EXPORT $VERSION);
-  $VERSION = '0.026';
-  @ISA    = 'Exporter';
-  @EXPORT = qw(now_playing now_playing_stream);
+  use vars qw(@ISA @EXPORT_OK $VERSION);
+  $VERSION   = '0.030';
+  @ISA       = 'Exporter';
+  @EXPORT_OK = qw(now_playing now_playing_stream);
 }
 
-use Carp qw(croak);
+use Carp;
 use Mplayer::NowPlaying::Genres;
 
 
 sub now_playing {
   my($log, $mode) = @_;
-  not defined $log and croak("No logfile specified\n");
+  not defined $log and Carp::croak("No mplayer log file specified\n");
 
   if(!defined($mode)) {
     $mode = 'default'; # mplayer *.mp3
@@ -123,7 +123,7 @@ sub now_playing_stream {
 
 sub _get_fh {
   my $file = shift;
-  not defined $file and croak("No logfile specified\n");
+  not defined $file and Carp::croak("No logfile specified\n");
 
   if(ref($file)) {
     return $file;
@@ -147,7 +147,9 @@ Mplayer::NowPlaying - query a running mplayer process for now playing metadata
 
     use Mplayer::NowPlaying;
 
-    my $current = now_playing;
+    my $log = "$ENV{HOME}/.mplayer/mplayer.log"; # or elsewhere
+
+    my $current = now_playing($log, 'identify');
 
     if(exists($current->{artist})) {
       print "Current artist is $current->{artist}\n";
@@ -161,24 +163,32 @@ playing' metadata for the currently playing media.
 
 =head1 EXPORTS
 
+None by default.
+
+=head1 FUNCTIONS
+
 =head2 now_playing()
 
-Parameters: $logfile | $filehandle, ($mode)
+=over 4
 
-Returns:    \%metadata
+=item Arguments:    $logfile | $filehandle, [ $mode ]
+
+=item Return value: \%metadata
+
+=back
 
   my %metadata = %{ now_playing($logfile, 'identify'); };
   my $artist = $metadata{artist};
 
-B<now_playing()> takes two arguments (the last one optional):
+B<now_playing()> takes two arguments, the last one is optional:
 
 * The logfile (or filehandle) output from mplayer is directed to
 
 * 'normal' or 'identify' mode. Normal is the default.
 
-Mplayer::NowPlaying::now_playing() supports two modes:
+=head2 MODES
 
-=head2 * Normal
+=head3 NORMAL
 
 Start mplayer in normal mode and redirect STDOUT to a file:
 
@@ -193,9 +203,9 @@ Get the current title:
 
 Mplayer produces a lot of output in normal mode, effectively making our metadata
 retrieval slow very fast (10 files played or so). Therefore it's really
-recommended to use B<identify> mode.
+recommended to use B<identify> mode, see below.
 
-=head2 * Identify
+=head3 IDENTIFY
 
 Start mplayer with the -identify switch:
 
@@ -259,9 +269,13 @@ Possible keys include:
 
 =head2 now_playing_stream()
 
-Parameters: $logfile | $filehandle
+=over 4
 
-Returns:    \%metadata
+=item Arguments:    $logfile | $filehandle
+
+=item Return value: \%metadata
+
+=back
 
 B<now_playing_stream()> takes a single argument; the logfile (or filehandle) to
 be used.
@@ -283,13 +297,19 @@ like so:
   magnus@trapd00r.se
   http://japh.se
 
-=cut
+=head1 CONTRIBUTORS
+
+None required yet.
 
 =head1 COPYRIGHT
 
-Copyright 2011 Magnus Woldrich <magnus@trapd00r.se>. This program is free
-software; you may redistribute it and/or modify it under the same terms as Perl
-itself.
+Copyright 2011 the B<Mplayer::NowPlaying> L</AUTHOR> and L</CONTRIBUTORS> as
+listed above.
+
+=head1 LICENSE
+
+This library is free software; you may redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =head1 SEE ALSO
 
